@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title class="head">User Data</title>
+</head>
+
+<body>
+    <div class="header-container">
+        <div class="container">
+            <form method="POST" action="/">
+                <label for="num_records">Number of Records:</label>
+                <input type="number" id="num_records" name="num_records" required><br><br>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <h1>Sensor Data Log</h1>
+        <div class="filter-container">
+            <button class="filter-button" data-sensor-id="All">All</button>
+            <button class="filter-button" data-sensor-id="cpu">cpu</button>
+            <button class="filter-button" data-sensor-id="mem">mem</button>
+            <button class="filter-button" data-sensor-id="disk">disk</button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>No.</th> <!-- New column for the row number/index -->
+                    <th>Machine ID</th>
+                    <th>Sensor Id</th>
+                    <th>Value</th>
+                    <th>Timestamp</th>
+                    <th>Alarm Indication</th>
+                    <!-- Add more columns if needed -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users|reverse %}
+                    <tr>
+                        <td></td> <!-- Placeholder for the row number/index -->
+                        <td>{{ user.machine_id }}</td>
+                        <td>{{ user.sensor_id }}</td>
+                        <td>{{ user.value }}</td>
+                        <td>{{ user.timestamp }}</td>
+                        <td>{{ user.alarme }}</td>
+                        <!-- Display other user properties -->
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-left">
+            UFMG: Belo Horizonte 2023/01<br>
+            Trabalhos: ATR<br>
+            Professor: André Paim<br>
+        </div>
+        <div class="footer-right">
+            Developers : <br>
+            Vincent Pernarh <br>
+            Enio Morais <br>
+        </div>
+        <div class="image-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2d/Symbolfumg.jpg" alt="image">
+        </div>
+    </footer>
+    
+
+</body>
+
+</html>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-y: scroll;
+    }
+
+    .header-container {
+        position: sticky;
+        top: 0;
+        background-color: rgb(6, 6, 105);
+        color: white;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding-right: 10px;
+        padding-left: 10px;
+        justify-content: space-between;
+    }
+
+    .container {
+        width: 20%;
+        padding: 10px;
+    }
+
+    .filter-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+
+    .filter-button {
+        margin-left: 10px;
+        background-color: lightgray;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    .table-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid black;
+        padding: 7px;
+        text-align: center;
+    }
+
+    th {
+        background-color: rgb(81, 74, 98);
+        opacity: 100%;
+        color: white;
+        position: sticky;
+        top: 98px;
+    }
+
+    /* CSS for alternating row colors */
+    tbody tr:nth-child(even) {
+        background-color: #e9e6e6;
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: #ffffff;
+    }
+
+    .footer {
+        background-color: lightblue;
+        padding: 5px;
+        text-align: center;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        position: sticky;
+        bottom: 0;
+    }
+
+    .footer-left {
+        text-align: left;
+        margin-left: 10px;
+        border-radius: 90%;
+    }
+
+    .image-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .image-container img {
+        height: 40px;
+        width: 40px;
+        border-radius: 50%;
+    }
+
+    .footer-right {
+        text-align: right;
+        margin-right: 10px;
+    }
+
+</style>
+
+<script>
+    const filterButtons = document.querySelectorAll('.filter-button');
+    const rows = document.querySelectorAll('tbody tr');
+    const footer = document.querySelector('.footer');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const sensorId = button.dataset.sensorId;
+            let index = 1; // Start index from 1
+
+            rows.forEach(row => {
+                const sensorIdCell = row.querySelector('td:nth-child(3)'); // Assuming Sensor ID is in the third column
+                const rowDisplay = sensorId === 'All' || sensorIdCell.textContent === sensorId ? 'table-row' : 'none';
+                row.style.display = rowDisplay;
+
+                if (rowDisplay === 'table-row') {
+                    row.querySelector('td:first-child').textContent = index++; // Update the row number/index
+                }
+            });
+
+            // Apply alternating row colors to visible rows
+            const visibleRows = document.querySelectorAll('tbody tr[style="display: table-row;"]');
+            visibleRows.forEach((row, i) => {
+                if (i % 2 === 0) {
+                    row.style.backgroundColor = '#e9e6e6';
+                } else {
+                    row.style.backgroundColor = '#ffffff';
+                }
+            });
+
+            // Check if the number of rows exceeds 15 to make the footer sticky
+            const visibleRowCount = visibleRows.length;
+            footer.style.position = visibleRowCount > 15 ? 'sticky' : 'static';
+        });
+    });
+
+    window.addEventListener('load', () => {
+        let index = 1;
+
+        rows.forEach(row => {
+            row.querySelector('td:first-child').textContent = index++;
+        });
+    });
+</script>
