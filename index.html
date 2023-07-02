@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MongoDB Data</title>
+</head>
+<body>
+    <h1>Records from MongoDB</h1>
+    <ul id="data-list"></ul>
+
+    <script>
+        // Use Fetch API to retrieve data from the server
+        fetch('/data')
+            .then(response => response.json())
+            .then(data => {
+                const dataList = document.getElementById('data-list');
+                data.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item.name; // Assuming each item has a 'name' field
+                    dataList.appendChild(li);
+                });
+            })
+            .catch(error => console.error(error));
+    </script>
+</body>
+</html>
+
